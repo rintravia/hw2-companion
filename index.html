@@ -2,38 +2,55 @@
 <html>
 <head>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+  <script src="https://unpkg.com/vue"></script>
 </head>
 <body>
 
 <div id="app" class="container">
-  <div class="row">
-    <input type="text" v-model="apiKey" placeholder="Api Key"/>
+  <div id="app-jumbotron" class="jumbotron" align="center">
+    <h1>HALO WARS 2 COMPANION</h1>
   </div>
-  <div class="row">
-    <div class="col-md-4">
-      <match-search :api-key="apiKey"></match-search>
+  <div class="row" align="center">
+    <div id="player-panel" class="col-md-3" align="left">
+      <h6 style="background-color: aqua">PLAYER CONTENT GOES HERE</h6>
+      <input type="text" v-model="gamerTag" placeholder="Gamer Tag"/>
+      <input type="text" v-model="apiKey" placeholder="Api Key"/>
     </div>
-    <div class="col-md-4">
-      <match-search :api-key="apiKey"></match-search>
-    </div>
-    <div class="col-md-4">
-      <match-search :api-key="apiKey"></match-search>
+    <div id="main-panel" class="col-md-9">
+      <h6 style="background-color: aqua">APPLICATION CONTENT GOES HERE</h6>
+      <div id="routes">
+        <ul class="list-inline">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#players">Players</a></li>
+          <li><a href="#matches">Matches</a></li>
+          <li><a href="#builds">Build Tool</a></li>
+        </ul>
+      </div>
+      <div id="viewport" style="margin-top: 5px">
+        <match-search id="match-search" :api-key="apiKey" :gamer-tag="gamerTag" hidden></match-search>
+        <match-events id="match-events" :api-key="apiKey" hidden></match-events>
+        <match-results id="match-results" :api-key="apiKey" hidden></match-results>
+      </div>
     </div>
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
-<script src="https://unpkg.com/vue"></script>
 <script type="text/javascript">
 
-Vue.component('match-search', {
-  props: ['apiKey'],
-  template: '<div><input type="text" v-model="gamerTag" placeholder="Gamer Tag"/><button v-on:click="search">Search</button><ul><li v-for="matchId in matchIds">{{matchId}}</li></ul></div>',
+let matchSearchComponent = Vue.component('match-search', {
+  props: ['apiKey', 'gamerTag'],
+  template: `
+    <div>
+      <button v-on:click="search">Search Matches</button>
+      <ul><li v-for="matchId in matchIds">{{matchId}}</li></ul>
+    </div>
+  `,
   methods: {
     search: function() {
-      var self = this;
+      let self = this;
       $.ajax({
         url: "https://www.haloapi.com/stats/hw2/players/" + self.gamerTag + "/matches",
         type: "GET",
@@ -44,16 +61,76 @@ Vue.component('match-search', {
   },
   data: function() {
     return {
-      gamerTag: '',
       matchIds: ''
     };
   }
 });
 
-var app = new Vue({
+let matchEventComponent = Vue.component('match-events', {
+  props: ['apiKey'],
+  template: `
+    <div>
+      <input type="text" v-model="matchId" placeholder="Match Id"/>
+      <button v-on:click="getMatch">Search Match Events</button>
+      <div>
+        {{output}}
+      </div>
+    </div>
+  `,
+  methods: {
+    getMatch: function() {
+      let self = this;
+      $.ajax({
+        url: "https://www.haloapi.com/stats/hw2/matches/" + self.matchId + "/events",
+        type: "GET",
+        beforeSend: function(xhr) { xhr.setRequestHeader('Ocp-Apim-Subscription-Key', self.apiKey); },
+        success: function(data) { self.output = JSON.stringify(data); }
+      });
+    }
+  },
+  data: function() {
+    return {
+      output: '',
+      matchId: ''
+    };
+  }
+});
+
+let matchResultsComponent = Vue.component('match-results', {
+  props: ['apiKey'],
+  template: `
+    <div>
+      <input type="text" v-model="matchId" placeholder="Match Id"/>
+      <button v-on:click="getMatch">Search Match Results</button>
+      <div>
+        {{output}}
+      </div>
+    </div>
+  `,
+  methods: {
+    getMatch: function() {
+      let self = this;
+      $.ajax({
+        url: "https://www.haloapi.com/stats/hw2/matches/" + self.matchId,
+        type: "GET",
+        beforeSend: function(xhr) { xhr.setRequestHeader('Ocp-Apim-Subscription-Key', self.apiKey); },
+        success: function(data) { self.output = JSON.stringify(data); }
+      });
+    }
+  },
+  data: function() {
+    return {
+      output: '',
+      matchId: ''
+    };
+  }
+});
+
+let app = new Vue({
   el: '#app',
   data: {
-    apiKey: ''
+    apiKey: '',
+    gamerTag: ''
   }
 });
 
