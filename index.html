@@ -12,12 +12,13 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
 <script src="https://unpkg.com/vue"></script>
 <script type="text/javascript">
 
 Vue.component('match-search', {
   props: ['apiKey'],
-  template: '<div><input type="text" v-model="gamerTag" placeholder="Gamer Tag"/><button v-on:click="search">Search</button><div>{{output}}</div></div>',
+  template: '<div><input type="text" v-model="gamerTag" placeholder="Gamer Tag"/><button v-on:click="search">Search</button><ul><li v-for="matchId in matchIds">{{matchId}}</li></ul></div>',
   methods: {
     search: function() {
       var self = this;
@@ -25,14 +26,14 @@ Vue.component('match-search', {
         url: "https://www.haloapi.com/stats/hw2/players/" + self.gamerTag + "/matches",
         type: "GET",
         beforeSend: function(xhr) { xhr.setRequestHeader('Ocp-Apim-Subscription-Key', self.apiKey); },
-        success: function(data) { self.output = data }
+        success: function(data) { self.matchIds = _.map(data['Results'], function(n) {return n.MatchId;}); }
       });
     }
   },
   data: function() {
     return {
       gamerTag: '',
-      output: ''
+      matchIds: ''
     };
   }
 });
