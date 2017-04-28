@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+
+<div id="app">
+  <div>
+    <input v-model="key" type="text" placeholder="HaloApi Key" />
+    <input v-model="matchId" type="text" placeholder="HW2 MatchId"/>
+    <button v-on:click="getEvents">Get Events</button>
+  </div>
+  <div>
+    {{crazyData}}
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://unpkg.com/vue"></script>
+<script type="text/javascript">
+var app = new Vue({
+    el: '#app',
+    methods: {
+        getEvents: function() {
+            var self = this;
+            $.ajax({
+                url: "https://www.haloapi.com/stats/hw2/matches/" + self.matchId,
+                type: "GET",
+                beforeSend: function(xhr) { xhr.setRequestHeader('Ocp-Apim-Subscription-Key', self.key); },
+                success: function(data) { self.crazyData = data; }
+            });
+        }
+    },
+    data: {
+        crazyData: '',
+        matchId: '',
+        key: ''
+    }
+});
+</script>
+</body>
+</html>
