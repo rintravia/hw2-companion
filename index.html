@@ -1,42 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <link src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
 <body>
 
-<div id="app">
-  <div>
-    <input v-model="key" type="text" placeholder="HaloApi Key" />
-    <input v-model="matchId" type="text" placeholder="HW2 MatchId"/>
-    <button v-on:click="getEvents">Get Events</button>
-  </div>
-  <div>
-    {{crazyData}}
-  </div>
+<div id="app" class="container">
+  <input type="text" v-model="apiKey" placeholder="Api Key"/>
+  <match-search :api-key="apiKey"></match-search>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="https://unpkg.com/vue"></script>
 <script type="text/javascript">
-var app = new Vue({
-    el: '#app',
-    methods: {
-        getEvents: function() {
-            var self = this;
-            $.ajax({
-                url: "https://www.haloapi.com/stats/hw2/matches/" + self.matchId,
-                type: "GET",
-                beforeSend: function(xhr) { xhr.setRequestHeader('Ocp-Apim-Subscription-Key', self.key); },
-                success: function(data) { self.crazyData = data; }
-            });
-        }
-    },
-    data: {
-        crazyData: '',
-        matchId: '',
-        key: ''
+
+Vue.component('match-search', {
+  props: ['apiKey'],
+  template: '<div><input type="text" v-model="gamerTag" placeholder="Gamer Tag"/><button v-on:click="search">Search</button><div>{{output}}</div></div>',
+  methods: {
+    search: function() {
+      var self = this;
+      $.ajax({
+        url: "https://www.haloapi.com/stats/hw2/players/" + self.gamerTag + "/matches",
+        type: "GET",
+        beforeSend: function(xhr) { xhr.setRequestHeader('Ocp-Apim-Subscription-Key', self.apiKey); },
+        success: function(data) { self.output = data }
+      });
     }
+  },
+  data: function() {
+    return {
+      gamerTag: '',
+      output: ''
+    };
+  }
 });
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    apiKey: ''
+  }
+});
+
 </script>
 </body>
 </html>
