@@ -1,13 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
 <body>
 
 <div id="app" class="container">
-  <input type="text" v-model="apiKey" placeholder="Api Key"/>
-  <match-search :api-key="apiKey"></match-search>
+  <div class="row">
+    <input type="text" v-model="apiKey" placeholder="Api Key"/>
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+      <match-search :api-key="apiKey"></match-search>
+    </div>
+    <div class="col-md-4">
+      <match-search :api-key="apiKey"></match-search>
+    </div>
+    <div class="col-md-4">
+      <match-search :api-key="apiKey"></match-search>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
